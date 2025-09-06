@@ -79,7 +79,7 @@ export const loginThunk = createAsyncThunk(
   }
 );
 
-// This thunk now uses the updated base URL
+// This thunk is now a local operation using localStorage
 export const logoutThunk = createAsyncThunk(
   "user/logout",
   async (_, thunkAPI) => {
@@ -88,7 +88,9 @@ export const logoutThunk = createAsyncThunk(
       const lastPath =
         state.router?.location?.pathname || window.location.pathname;
       localStorage.setItem("lastVisitedPage", lastPath);
-      await moneyGuardAPI.post("/auth/logout");
+      // Remove tokens from local storage and reset auth header
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userData");
       resetAuthHeader();
       toast.success("Logout successful! We'll be waiting for you!");
     } catch (error) {
@@ -105,7 +107,7 @@ export const refreshUserThunk = createAsyncThunk(
     const savedToken = localStorage.getItem("userToken");
     if (!savedToken) {
       return thunkAPI.rejectWithValue("Token is not exist");
-    }
+      }
     setAuthHeader(savedToken);
     try {
       const { data } = await moneyGuardAPI.get("/users/current");
