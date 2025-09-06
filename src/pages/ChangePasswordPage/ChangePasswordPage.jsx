@@ -1,6 +1,6 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { changePassword } from "../../redux/auth/operations";
+// Password change not available in GoIT Wallet API
 import { useForm } from "react-hook-form";
 import css from "./ChangePasswordPage.module.css";
 import PasswordStrengthBar from "react-password-strength-bar-with-style-item";
@@ -40,10 +40,9 @@ const handlePasswordVisibility = () => {
   }
 
   const onSubmit = (values) => {
-    const { confirmPassword, ...payload } = values;
-    dispatch(changePassword({ token, password: payload.password }))
-      .unwrap()
-      .then(() => navigate("/login"));
+    // Password change not available in GoIT Wallet API
+    console.log("Password change not supported by API");
+    navigate("/login");
   };
 
   register("password", {
