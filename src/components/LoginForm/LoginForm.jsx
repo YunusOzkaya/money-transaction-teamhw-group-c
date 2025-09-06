@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
 
-import { loginThunk, resetPassword } from "../../redux/auth/operations.js";
+import { loginThunk } from "../../redux/auth/operations.js";
 import { loginSchema } from "../../schemas/schemas.js";
 
 import s from "./LoginForm.module.css";
@@ -25,14 +25,8 @@ const LoginForm = () => {
   };
 
   const handleResetPassword = (email) => {
-    if (!email) {
-      toast.error("Please enter your email to reset password");
-      return;
-    }
-  
-    dispatch(resetPassword({ email }))
-      .unwrap()
-      
+    // Password reset not available in GoIT Wallet API
+    console.log("Password reset not supported by API");
   };
 
 
