@@ -3,7 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
 export const moneyGuardAPI = axios.create({
-  baseURL: "https://wallet.b.goit.study/",
+  baseURL: "https://wallet.b.goit.study/api",
   withCredentials: true,
 });
 
