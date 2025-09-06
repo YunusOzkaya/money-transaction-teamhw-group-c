@@ -43,7 +43,6 @@ export const loginThunk = createAsyncThunk(
       
       return data;
     } catch (error) {
-      toast.error("Login failed. Please check your credentials.");
       return thunkAPI.rejectWithValue(error.message);
     }
   }
