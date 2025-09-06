@@ -15,71 +15,41 @@ export const resetAuthHeader = () => {
   moneyGuardAPI.defaults.headers.common.Authorization = ``;
 };
 
-// This thunk is now a local operation using localStorage
+// This thunk now uses the real API endpoint for registration
 export const registerThunk = createAsyncThunk(
   "user/register",
   async (credentials, thunkAPI) => {
     try {
-      // Simulate successful registration and store user data locally
-      const dummyToken = "dummy-auth-token-" + Math.random().toString(36).substr(2, 9);
-      const userData = {
-        user: {
-          name: credentials.name,
-          email: credentials.email,
-          avatarURL: null,
-        },
-        accessToken: dummyToken,
-      };
-
-      // Store the token and user data in local storage
-      localStorage.setItem("userToken", dummyToken);
-      localStorage.setItem("userData", JSON.stringify(userData.user));
-          
-      setAuthHeader(dummyToken);
+      const { data } = await moneyGuardAPI.post("/api/auth/sign-up", credentials);
+        setAuthHeader(data.data.accessToken);
       toast.success("Registration successful! Welcome aboard.");
-      
-      return { data: userData };
+      
+      return data;
     } catch (error) {
-      // Simplified error handling for local operations
       toast.error("Registration failed. Please try again.");
       return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
 
-// This thunk is now a local operation using localStorage
+// This thunk now uses the real API endpoint for login
 export const loginThunk = createAsyncThunk(
   "user/login",
   async (credentials, thunkAPI) => {
     try {
-      // Simulate successful login and retrieve token from local storage
-      const dummyToken = "dummy-auth-token-123456"; // Use a consistent dummy token for login
-      const userData = {
-        user: {
-          name: "Dummy User",
-          email: credentials.email,
-          avatarURL: null,
-        },
-        accessToken: dummyToken,
-      };
-      
-      // Store the token and user data in local storage
-      localStorage.setItem("userToken", dummyToken);
-      localStorage.setItem("userData", JSON.stringify(userData.user));
-
-      setAuthHeader(dummyToken);
+      const { data } = await moneyGuardAPI.post("/api/auth/sign-in", credentials);
+        setAuthHeader(data.data.accessToken);
       toast.success("Login successful! Welcome back.");
-      
-      return { data: userData };
+      
+      return data;
     } catch (error) {
-      // Simplified error handling for local operations
       toast.error("Login failed. Please check your credentials.");
       return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
 
-// This thunk is now a local operation using localStorage
+// This thunk now uses the real API endpoint for logout
 export const logoutThunk = createAsyncThunk(
   "user/logout",
   async (_, thunkAPI) => {
@@ -88,9 +58,7 @@ export const logoutThunk = createAsyncThunk(
       const lastPath =
         state.router?.location?.pathname || window.location.pathname;
       localStorage.setItem("lastVisitedPage", lastPath);
-      // Remove tokens from local storage and reset auth header
-      localStorage.removeItem("userToken");
-      localStorage.removeItem("userData");
+      await moneyGuardAPI.delete("/api/auth/sign-out");
       resetAuthHeader();
       toast.success("Logout successful! We'll be waiting for you!");
     } catch (error) {
@@ -104,13 +72,14 @@ export const logoutThunk = createAsyncThunk(
 export const refreshUserThunk = createAsyncThunk(
   "user/refresh",
   async (_, thunkAPI) => {
-    const savedToken = localStorage.getItem("userToken");
+    const state = thunkAPI.getState();
+    const savedToken = state.auth.token; // Changed to get token from state
     if (!savedToken) {
       return thunkAPI.rejectWithValue("Token is not exist");
       }
     setAuthHeader(savedToken);
     try {
-      const { data } = await moneyGuardAPI.get("/users/current");
+      const { data } = await moneyGuardAPI.get("/api/users/current");
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -123,7 +92,7 @@ export const editUserName = createAsyncThunk(
   "users/editName",
   async ({ name }, thunkAPI) => {
     try {
-      const { data } = await moneyGuardAPI.patch(`/users/current`, { name });
+      const { data } = await moneyGuardAPI.patch(`/api/users/current`, { name });
       refreshUserThunk();
       return data;
     } catch (error) {
@@ -141,7 +110,7 @@ export const editUserAvatar = createAsyncThunk(
       formData.append("avatar", avatar);
 
       const { data } = await moneyGuardAPI.patch(
-        "/users/current/avatar",
+        "/api/users/current/avatar",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -160,7 +129,7 @@ export const getTotalBalanceThunk = createAsyncThunk(
   "balance/get",
   async (_, thunkAPI) => {
     try {
-      const { data } = await moneyGuardAPI.get("/users/current");
+      const { data } = await moneyGuardAPI.get("/api/users/current");
       return data.data.balance;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -173,7 +142,7 @@ export const resetPassword = createAsyncThunk(
   "users/resetPassword",
   async (credentials, thunkAPI) => {
     try {
-      const data = await moneyGuardAPI.post(`/auth/send-reset-email`, credentials);
+      const data = await moneyGuardAPI.post(`/api/auth/send-reset-email`, credentials);
       toast.success("Reset Email password was sent successfully");
       return data.data;
     } catch (error) {
@@ -187,7 +156,7 @@ export const changePassword = createAsyncThunk(
   "users/changePassword",
   async(credentials, thunkAPI) => {
     try {
-      const data = await moneyGuardAPI.post('/auth/reset-pwd', credentials);
+      const data = await moneyGuardAPI.post('/api/auth/reset-pwd', credentials);
       toast.success("Password was changed successfully");
       return data.data;
     } catch (error) {
