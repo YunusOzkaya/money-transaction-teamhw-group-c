@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 
 export const moneyGuardAPI = axios.create({
   baseURL: "https://server-money-guard-teamproject.onrender.com/",
-  withCredentials: true,
+  withCredentials: false,
 });
 
 export const setAuthHeader = (token) => {
