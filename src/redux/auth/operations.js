@@ -24,13 +24,13 @@ export const registerThunk = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       const { data } = await moneyGuardAPI.post("/auth/sign-up", credentials);
-      const token = data.accessToken;
+      const token = data.token;
       setAuthHeader(token);
       localStorage.setItem("authUser", JSON.stringify(data.user));
-      toast.success("Registration successful!");
+      toast.success("Kayıt başarılı!");
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed");
+      toast.error(error.response?.data?.message || "Kayıt başarısız oldu.");
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -42,13 +42,13 @@ export const loginThunk = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       const { data } = await moneyGuardAPI.post("/auth/sign-in", credentials);
-      const token = data.accessToken;
+      const token = data.token;
       setAuthHeader(token);
       localStorage.setItem("authUser", JSON.stringify(data.user));
-      toast.success("Login successful!");
+      toast.success("Giriş başarılı!");
       return data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(error.response?.data?.message || "Giriş başarısız oldu.");
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -57,11 +57,11 @@ export const loginThunk = createAsyncThunk(
 // LOGOUT
 export const logoutThunk = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   try {
-    await moneyGuardAPI.post("/auth/logout");
+    await moneyGuardAPI.delete("/auth/sign-out");
     resetAuthHeader();
-    toast.success("Logged out");
+    toast.success("Çıkış yapıldı.");
   } catch (error) {
-    toast.error("Logout failed");
+    toast.error("Çıkış başarısız oldu.");
     return thunkAPI.rejectWithValue(error.message);
   }
 });
