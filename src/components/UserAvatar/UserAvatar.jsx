@@ -12,7 +12,7 @@ const UserAvatar = ({
 
   const getInitial = (name) => name.trim()?.[0]?.toUpperCase() || "?";
 
-  const initial = loggedIn && user.name ? getInitial(user.name) : null;
+  const initial = loggedIn && user.username ? getInitial(user.username) : null;
 
   const getRandomHexColor = () =>
     "#" +
@@ -60,7 +60,7 @@ const UserAvatar = ({
     return <div style={styles.anonymous}>Name</div>;
   }
 
-  const avatarSrc = customAvatar || user.avatar;
+  const avatarSrc = customAvatar; // Avatar not supported by API
 
   return (
     <div style={styles.wrapper}>
