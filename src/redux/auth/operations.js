@@ -19,7 +19,7 @@ export const registerThunk = createAsyncThunk("auth/register", async (body, { re
     return data;
   } catch (e) {
     toast.error(e.response?.data?.message || "Register failed");
-    return rejectWithValue(e.message);
+    return rejectWithValue(e.message); 
   }
 });
 
