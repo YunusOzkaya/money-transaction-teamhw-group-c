@@ -1,60 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
 import { closeProfileModal } from "../../redux/modal/slice";
 import s from "./UserModal.module.css";
 import { selectUser } from "../../redux/auth/selectors";
-import { editUserAvatar, editUserName } from "../../redux/auth/operations";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import useMedia from "../../hooks/UseMadia";
-import FormButton from "../FormButton/FormButton";
 
 const UserModal = () => {
   const dispatch = useDispatch();
   const { isMobile } = useMedia();
-  const { name: currentName, avatar: currentAvatar } = useSelector(selectUser);
+  const { username: currentName } = useSelector(selectUser);
 
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: { name: currentName },
-    mode: "onChange",
-  });
-
-  const [avatar, setAvatar] = useState(currentAvatar);
-  const [file, setFile] = useState(null);
-
-  const watchedName = watch("name");
+  // Form functionality removed - profile editing not supported by API
 
   const onSubmit = async (data) => {
-    if (!data.name.trim() && !file) return;
-
-    const namePromise = data.name.trim()
-      ? dispatch(editUserName({ name: data.name.trim() }))
-      : null;
-
-    const avatarPromise = file
-      ? dispatch(editUserAvatar({ avatar: file }))
-      : null;
-
-    try {
-      await Promise.all([namePromise, avatarPromise]);
-      dispatch(closeProfileModal());
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    }
+    // Profile editing not available in GoIT Wallet API
+    console.log("Profile editing not supported by API");
+    dispatch(closeProfileModal());
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFile(file);
-      setAvatar(URL.createObjectURL(file));
-    }
-  };
+  // Avatar functionality removed
 
   const closeModal = () => dispatch(closeProfileModal());
 
@@ -87,60 +52,41 @@ const UserModal = () => {
         </button>
         <p className={s.text}>Edit profile</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={s.form}>
-          <label className={s.avatarLabel}>
+        <div className={s.form}>
+          <div className={s.avatarLabel}>
             {isMobile ? (
               <UserAvatar
-                customAvatar={avatar}
                 size={96}
                 borderRadius={11}
                 fontSize={48}
               />
             ) : (
               <UserAvatar
-                customAvatar={avatar}
                 size={68}
                 borderRadius={8}
                 fontSize={36}
               />
             )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className={s.hiddenFileInput}
-            />
-            <div className={s.plusIcon}>
-              <svg className={s.iconPlus}>
-                <use href={"/icons.svg#icon-plus"}></use>
-              </svg>
-            </div>
-          </label>
+          </div>
 
           <div className={s.labelBox}>
             <input
-              {...register("name", {
-                required: "Name is required",
-                pattern: {
-                  value: /^[A-Za-z\s'-]+$/,
-                  message: "Error: You can add only letters",
-                },
-              })}
-              placeholder="Enter your name"
-              defaultValue={currentName}
-              className={`${s.input} ${errors.name ? s.errorInput : ""}`}
+              value={currentName || "Username"}
+              readOnly
+              className={s.input}
+              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
             />
-            {errors.name && <p className={s.error}>{errors.name.message}</p>}
+            <p className={s.infoText}>Profile editing not available</p>
           </div>
 
           <button
-            type="submit"
+            type="button"
+            onClick={closeModal}
             className={s.saveBtn}
-            disabled={!watchedName || !!errors.name}
           >
-            Save
+            Close
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
