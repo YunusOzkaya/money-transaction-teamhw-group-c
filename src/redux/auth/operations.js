@@ -120,6 +120,7 @@ export const getCategoriesThunk = createAsyncThunk("categories/get", async (_, {
   }
 });
 
+
 export const addTransactionThunk = createAsyncThunk("transactions/add", async (tx, { rejectWithValue }) => {
   try {
     const { data } = await API.post("/transactions", tx);
