@@ -4,13 +4,17 @@ import toast from "react-hot-toast";
 
 const API = axios.create({ baseURL: "https://wallet.b.goit.study/api" });
 
-export const setAuthHeader = (t) => (API.defaults.headers.common.Authorization = `Bearer ${t}`);
-export const resetAuthHeader = () => delete API.defaults.headers.common.Authorization;
+export const setAuthHeader = (token) => {
+  API.defaults.headers.common.Authorization = `Bearer ${token}`;
+};
+export const resetAuthHeader = () => {
+  delete API.defaults.headers.common.Authorization;
+};
 
 export const registerThunk = createAsyncThunk("auth/register", async (body, { rejectWithValue }) => {
   try {
     const { data } = await API.post("/auth/sign-up", body);
-    setAuthHeader(data.data.accessToken);
+    setAuthHeader(data.accessToken);
     toast.success("Registered");
     return data;
   } catch (e) {
@@ -22,7 +26,7 @@ export const registerThunk = createAsyncThunk("auth/register", async (body, { re
 export const loginThunk = createAsyncThunk("auth/login", async (body, { rejectWithValue }) => {
   try {
     const { data } = await API.post("/auth/sign-in", body);
-    setAuthHeader(data.data.accessToken);
+    setAuthHeader(data.accessToken);
     toast.success("Logged in");
     return data;
   } catch (e) {
@@ -68,7 +72,9 @@ export const editUserAvatar = createAsyncThunk("users/editAvatar", async ({ avat
   try {
     const fd = new FormData();
     fd.append("avatar", avatar);
-    const { data } = await API.patch("/users/current/avatar", fd, { headers: { "Content-Type": "multipart/form-data" } });
+    const { data } = await API.patch("/users/current/avatar", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     await dispatch(refreshUserThunk());
     return data;
   } catch (e) {
@@ -79,7 +85,7 @@ export const editUserAvatar = createAsyncThunk("users/editAvatar", async ({ avat
 export const getTotalBalanceThunk = createAsyncThunk("balance/get", async (_, { rejectWithValue }) => {
   try {
     const { data } = await API.get("/users/current");
-    return data.data.balance;
+    return data.balance;
   } catch (e) {
     return rejectWithValue(e.message);
   }
